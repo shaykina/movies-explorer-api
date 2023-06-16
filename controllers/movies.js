@@ -5,8 +5,8 @@ const BadRequestError = require('../errors/BadRequestError');
 const ForbiddenError = require('../errors/ForbiddenError');
 
 module.exports.getMovies = (req, res, next) => {
-  Movie.find({})
-    .populate(['owner'])
+  const owner = req.user._id;
+  Movie.find({ owner })
     .then((movies) => res.send(movies))
     .catch(next);
 };
@@ -58,15 +58,12 @@ module.exports.createMovie = (req, res, next) => {
     nameEN,
     thumbnail,
     movieId,
-    owner: req.user,
+    owner: req.user._id,
   })
-    .then((data) => {
-      data.populate(['owner'])
-        .then((movie) => res.send(movie));
-    })
+    .then((movie) => res.send(movie))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new BadRequestError('Переданы некорректные данные при создании карточки'));
+        next(new BadRequestError('Переданы некорректные данные при создании фильма'));
       } else {
         next(err);
       }

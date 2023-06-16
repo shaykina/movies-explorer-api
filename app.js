@@ -12,13 +12,15 @@ const NotFoundError = require('./errors/NotFoundError');
 require('dotenv').config();
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 
+const { DATABASE_URL, NODE_ENV } = process.env;
+
 const PORT = 3000;
 const app = express();
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-mongoose.connect('mongodb://127.0.0.1:27017/bitfilmsdb', {});
+mongoose.connect(NODE_ENV === 'production' ? DATABASE_URL : 'mongodb://127.0.0.1:27017/bitfilmsdb', {});
 
 app.use(cors({
   origin: [
